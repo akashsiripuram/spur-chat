@@ -12,16 +12,54 @@ client
   .catch(() => console.log("Error connecting to DB"));
 
 app.use(express.json());
+app.use((_req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  if (_req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 app.post("/chat/createConversation", async (req, res) => {
-  const createdTime = new Date();
-  const created = await client.query(
-    `INSERT INTO conversations (id,created_at) VALUES (gen_random_uuid(), $1)`,
-    [createdTime],
+   const created = await client.query(
+    `
+    INSERT INTO conversations (id, created_at)
+    VALUES (gen_random_uuid(), NOW())
+    RETURNING id  
+    `
   );
+
   return res.json({
-    created,
+    conversation_id: created.rows[0].id,
+  
   });
+});
+app.get("/chat/:conversationId", async (req, res) => {
+  try {
+    const conversationId = req.params.conversationId;
+
+    const messages = await client.query(
+      `
+      SELECT *
+      FROM messages
+      WHERE conversation_id = $1
+      ORDER BY created_at ASC
+      `,
+      [conversationId]
+    );
+
+    return res.json({
+      conversation_id: conversationId,
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Failed to fetch messages",
+    });
+  }
 });
 app.post("/chat/message", async (req, res) => {
   const userPrompt: string = req.body.userPrompt;

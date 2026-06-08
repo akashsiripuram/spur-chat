@@ -112,7 +112,9 @@ export default function FloatingIcon() {
     }
 
     const loadMessages = async () => {
-      const conversationId = localStorage.getItem('conversationId')
+      let conversationId;
+      if(typeof window!=null)
+      conversationId = localStorage.getItem('conversationId')
 
       if (!conversationId) {
         setMessages(initialMessages)
@@ -167,11 +169,14 @@ export default function FloatingIcon() {
     setIsSending(true)
 
     try {
-      let conversationId = localStorage.getItem('conversationId')
+      let conversationId;
+      if(typeof window!=null)
+      conversationId = localStorage.getItem('conversationId')
 
       if (!conversationId) {
         const createConversation = await api.post<CreateConversationResponse>('/chat/createConversation')
-        conversationId = createConversation.data.conversation_id
+        conversationId = createConversation.data.conversation_id;
+        if(typeof window!=null)
         localStorage.setItem('conversationId', conversationId)
       }
 

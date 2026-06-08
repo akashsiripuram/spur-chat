@@ -152,29 +152,26 @@ Create the database:
 createdb spur_chat
 ```
 
-Run this SQL in `psql`, pgAdmin, Supabase SQL editor, Neon SQL editor, or your preferred Postgres client:
+This project is meant to use PostgreSQL. Run this SQL in your PostgreSQL database:
 
 ```sql
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
-CREATE TABLE IF NOT EXISTS conversations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE conversations (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
-  role TEXT NOT NULL CHECK (role IN ('USER', 'AI')),
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE messages (
+    id UUID PRIMARY KEY,
+    conversation_id UUID REFERENCES conversations(id),
+    role VARCHAR(20),
+    content TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE INDEX IF NOT EXISTS messages_conversation_created_at_idx
-  ON messages(conversation_id, created_at);
 ```
 
-Or run it from the terminal with `psql`:
+If you are using Neon, paste and run the SQL in the Neon SQL editor after setting `DATABASE_URL` to the Neon PostgreSQL connection string.
+
+If you are running PostgreSQL locally, run it in your `psql` terminal:
 
 ```bash
 psql "postgres://postgres:postgres@localhost:5432/spur_chat"
@@ -182,9 +179,7 @@ psql "postgres://postgres:postgres@localhost:5432/spur_chat"
 
 Then paste the SQL above.
 
-### Seed Data
-
-No database seed is required right now. Store policy and FAQ knowledge are hardcoded into the LLM system prompt in `backend/utils/getLlmResponse.ts`.
+If Prisma is added later, the schema can be represented in Prisma models and migrations can be generated and run through the backend workflow instead of manually pasting SQL.
 
 ### 4. Start the backend
 

@@ -5,17 +5,13 @@ Spur Chat is a small customer-support chat app. It has a React/Vite frontend wit
 ## Features
 
 - Floating customer-support chat widget
-- User and AI message bubbles
-- Enter-to-send form behavior
-- Disabled input while the assistant is replying
-- Typing indicator while the request is in flight
 - Conversation history persisted in PostgreSQL
 - Conversation restore using `conversationId` saved in `localStorage`
 - Store FAQ/domain knowledge included in the LLM system prompt
 
 ## Tech Stack
 
-- Frontend: React, TypeScript, Vite, Tailwind CSS
+- Frontend: React, TypeScript, Tailwind CSS
 - Backend: Node.js, Express, TypeScript
 - Database: PostgreSQL
 - LLM provider: Groq SDK
